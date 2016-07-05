@@ -6,8 +6,9 @@ Input: unsorted array
  */
 #include <stdio.h>
 #include <stdlib.h>
-#define HOARE
-//#define LOMUTO
+#define RANDOM_PIVOT
+#define HOARE_PARTITION
+//#define LOMUTO_PARTITION
 
 int __parray(int *arr, int size)
 {
@@ -29,6 +30,7 @@ void __swap(int *pos1, int *pos2)
 	return;
 }
 
+#if defined(RANDOM_PIVOT)
 int __random(int min, int max)
 {
 	int rdm;
@@ -43,14 +45,16 @@ int __random(int min, int max)
 	rdm = min + (rdm % (max - min + 1));
 	return rdm;
 }
+#endif
 
+#if defined(LOMUTO_PARTITION)
 int __lomuto_partition(int *arr, int beg, int end)
 {
 	if (beg < end) {
-
+#if defined(RANDOM_PIVOT)
 		int pivot_index = __random(beg, end);
 		__swap(&arr[beg], &arr[pivot_index]);
-
+#endif
 		int pivot = arr[beg];
 		int par = beg, i = 0;
 
@@ -71,14 +75,17 @@ int __lomuto_partition(int *arr, int beg, int end)
 		return beg;
 	}
 }
+#endif
 
+#if defined(HOARE_PARTITION)
 int __hoare_partition (int *arr, int beg, int end)
 {
 	if (beg < end) {
 		// doesn't work for pivot = arr[end]
+#if defined(RANDOM_PIVOT)
 		int pivot_index = __random(beg, end);
 		__swap(&arr[beg], &arr[pivot_index]);
-
+#endif
 		int pivot = arr[beg];
 		beg = beg - 1;
 		end = end + 1;
@@ -94,6 +101,7 @@ int __hoare_partition (int *arr, int beg, int end)
 	}
 	return end;
 }
+#endif
 
 void __qsort(int *arr, int beg, int end)
 {
@@ -101,10 +109,10 @@ void __qsort(int *arr, int beg, int end)
 
 	// should not go ahead for one or less elements
 	if (beg < end) {
-#if defined(HOARE)
+#if defined(HOARE_PARTITION)
 		partition = __hoare_partition(arr, beg, end);
 		__qsort(arr, beg, partition);
-#elif defined(LOMUTO)
+#elif defined(LOMUTO_PARTITION)
 		partition = __lomuto_partition(arr, beg, end);
 		__qsort(arr, beg, partition - 1);
 #endif
@@ -114,19 +122,6 @@ void __qsort(int *arr, int beg, int end)
 	return;
 }
 
-#if 0
-int HoarePartition (int a[],int p, int r) {
-	int x=a[p], i=p-1, j=r+1;
-	while (1) {
-		do  i++; while (a[i] < x);
-		do  j--; while (a[j] > x);
-		if  (i < j)
-			__swap(&a[i],&a[j]);
-		else
-			return j;
-	}
-}
-#endif
 void gm_qsort(int *arr, int size)
 {
 	if (!arr)
@@ -142,7 +137,7 @@ int main()
 		{ 1},
 		{ 4, 1},
 		{ 4, -5, -1},
-		{ 4, 4, 2, 4},
+		{ 4, 2, 1, 0},
 		{ 6, 4, 3, 1, 4}
 	};
 
