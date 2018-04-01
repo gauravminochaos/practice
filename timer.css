@@ -1,0 +1,35 @@
+.timer {
+  display: flex;
+  width: 5%;
+  text-align: center;
+  margin: auto;
+}
+
+.secs, .mins, .sep, .s_display, .m_display {
+  position: relative;
+  text-align: center;
+  margin: auto;
+  border: 0em;
+  padding: 0em;
+  color: blue;
+  font-size: 200%;
+}
+
+.secs {
+  float: right;
+}
+
+.mins {
+  float: left;
+}
+
+.s_up, .s_down, .m_up, .m_down {
+  float: none;
+  position: relative;
+  text-align: center;
+  margin: auto;
+  border: 0em;
+  padding: 0em;
+  color: blue;
+  font-size: 100%;
+}
