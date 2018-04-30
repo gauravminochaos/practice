@@ -1,9 +1,3 @@
-var s_up, s_down, s_display;
-var second_counter, minute_counter;
-var counting;
-var s_count, m_count;
-var audio_file;
-
 window.onload = function() {
   counting = 0;
   audio_file = "beep.mp3"
@@ -19,12 +13,47 @@ window.onload = function() {
   m_display = document.getElementById('m_display');
   minute_counter = new counter();
   minute_counter.hookup(m_display, m_up, m_down, 60);
-
-  s_count = Number(s_display.innerText);
-  m_count = Number(m_display.innerText);
-
   m_display.onclick = handle_display_press;
   s_display.onclick = handle_display_press;
+
+  l_display = document.getElementById('l_display');
+  l_left = document.getElementById('l_left');
+  l_right = document.getElementById('l_right');
+
+  readTextFile("/home/hello/work/practice/timer/timer.json", function(text) {
+    data = JSON.parse(text);
+    curr_index = 0;
+    data_len = data.length;
+    init_display(data, curr_index);
+  });
+
+  init_display = function(data, index) {
+    l_display.innerText = data[index].name;
+    format_display(s_display, data[index].secs);
+    format_display(m_display, data[index].mins);
+  }
+
+  l_left.onclick = function() {
+    curr_index = curr_index > 0 ? curr_index - 1 : curr_index;
+    init_display(data, curr_index);
+  }
+
+  l_right.onclick = function() {
+    curr_index = curr_index < data_len - 1 ? curr_index + 1 : curr_index;
+    init_display(data, curr_index);
+  }
+}
+
+function readTextFile(file, callback) {
+  var rawFile = new XMLHttpRequest();
+  rawFile.overrideMimeType("application/json");
+  rawFile.open("GET", file, true);
+  rawFile.onreadystatechange = function() {
+    if (rawFile.readyState === 4 && rawFile.status == "200") {
+      callback(rawFile.responseText);
+    }
+  }
+  rawFile.send(null);
 }
 
 handle_display_press = function() {
@@ -39,22 +68,27 @@ handle_display_press = function() {
   }
 };
 
+format_display = function(display, count) {
+  display.innerText = count < 10 ? '0' + count : count;
+}
+
 decrement = function() {
   s_count = Number(s_display.innerText);
-  s_count = s_count - 1 > 0 ? s_count - 1 : 0;
-  s_display.innerText = s_count < 10 ? '0' + s_count : s_count;
 
   if (s_count == 0) {
     m_count = Number(m_display.innerText);
-    if (m_count != 0) {
+    if (m_count > 0) {
       m_count = m_count - 1;
-      m_display.innerText = m_count < 10 ? '0' + m_count : m_count;
-      s_display.innerText = 60;
-    } else if (m_count == 0) {
+      format_display(s_display, 59);
+      format_display(m_display, m_count);
+    } else {
       counting = 0;
       clearInterval(self.interval);
       play_sound();
     }
+  } else {
+    s_count = s_count - 1 > 0 ? s_count - 1 : 0;
+    format_display(s_display, s_count);
   }
 };
 
